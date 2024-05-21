@@ -44,9 +44,7 @@ qmgr = pymqi.QueueManager(None)
 qmgr.connect_with_options(config['qmgr'], cd=cd, sco=sco, opts=opts)
 queue = pymqi.Queue(qmgr, config['queue'])
 
-keep_alive = True
-
-while keep_alive:
+while True:
     try:
         message = queue.get(None, md, gmo)
         logging.info(f"Got message '{message}' from '{config['queue']}' queue")
