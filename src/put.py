@@ -18,7 +18,7 @@ config = {
 }
 
 logging.info(f"Connect to '{config['qmgr']}' queue manager from '{config['connection']}' via '{config['channel']}' channel")
-logging.info(f"Use TLS with 'TLS_RSA_WITH_AES_128_CBC_SHA256' cipher spec and './{config['key_repository']}' key store")
+logging.info(f"Use TLS with 'TLS_RSA_WITH_AES_128_CBC_SHA256' cipher spec and '{config['key_repository']}' key store")
 logging.info(f"Use mTLS with '{config['cert_label']}' certificate")
 
 os.environ['MQAPPLNAME'] = pathlib.Path(__file__).stem
