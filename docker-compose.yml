@@ -1,0 +1,36 @@
+services:
+  qm1:
+    image: ${IMAGE}
+    environment:
+      - LICENSE=accept
+      - MQ_QMGR_NAME=QM1
+      - MQ_APP_PASSWORD=${MQ_APP_PASSWORD}
+      - MQ_ADMIN_PASSWORD=${MQ_ADMIN_PASSWORD}
+      - MQ_ENABLE_METRICS=true
+    ports:
+      - "1414:1414"
+      - "9443:9443"
+      - "9157:9157"
+    volumes:
+      - qm1-data:/mnt/mqm
+      - ./mqsc/50-qm1-config.mqsc:/etc/mqm/50-qm1-config.mqsc
+
+  qm2:
+    image: ${IMAGE}
+    environment:
+      - LICENSE=accept
+      - MQ_QMGR_NAME=QM2
+      - MQ_APP_PASSWORD=${MQ_APP_PASSWORD}
+      - MQ_ADMIN_PASSWORD=${MQ_ADMIN_PASSWORD}
+      - MQ_ENABLE_METRICS=true
+    ports:
+      - "1415:1414"
+      - "9444:9443"
+      - "9158:9157"
+    volumes:
+      - qm2-data:/mnt/mqm
+      - ./mqsc/50-qm2-config.mqsc:/etc/mqm/50-qm2-config.mqsc
+
+volumes:
+  qm1-data:
+  qm2-data:

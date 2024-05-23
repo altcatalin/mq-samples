@@ -14,29 +14,36 @@ config = {
     "cert_label": os.getenv("CERT_LABEL"),
     "qmgr": os.getenv("QMGR"),
     "channel": os.getenv("CHANNEL"),
-    "queue": os.getenv("QUEUE")
+    "queue": os.getenv("QUEUE"),
+    "user": os.getenv("MQ_USER", "app"),
+    "password": os.getenv("MQ_USER_PASSWORD", "passw0rd"),
 }
 
 logging.info(f"Connect to '{config['qmgr']}' queue manager from '{config['connection']}' via '{config['channel']}' channel")
-logging.info(f"Use TLS with 'TLS_RSA_WITH_AES_128_CBC_SHA256' cipher spec and '{config['key_repository']}' key store")
-logging.info(f"Use mTLS with '{config['cert_label']}' certificate")
 
+config['mtls'] = config['key_repository'] and config['cert_label']
 os.environ['MQAPPLNAME'] = pathlib.Path(__file__).stem
 
 cd = pymqi.CD()
 cd.ConnectionName = config['connection'].encode(encoding='UTF-8')
 cd.ChannelName = config['channel'].encode(encoding='UTF-8')
-cd.SSLCipherSpec = 'TLS_RSA_WITH_AES_128_CBC_SHA256'.encode(encoding='UTF-8')
-cd.SSLClientAuth = pymqi.CMQXC.MQSCA_REQUIRED
 
 sco = pymqi.SCO()
-sco.KeyRepository = config['key_repository'].encode(encoding='UTF-8')
-sco.CertificateLabel = config['cert_label'].encode(encoding='UTF-8')
+
+if config['mtls']:
+    logging.info(f"Use TLS with 'TLS_RSA_WITH_AES_128_CBC_SHA256' cipher spec and '{config['key_repository']}' key store")
+    logging.info(f"Use mTLS with '{config['cert_label']}' certificate")
+
+    cd.SSLCipherSpec = 'TLS_RSA_WITH_AES_128_CBC_SHA256'.encode(encoding='UTF-8')
+    cd.SSLClientAuth = pymqi.CMQXC.MQSCA_REQUIRED
+
+    sco.KeyRepository = config['key_repository'].encode(encoding='UTF-8')
+    sco.CertificateLabel = config['cert_label'].encode(encoding='UTF-8')
 
 opts = pymqi.CMQC.MQCNO_RECONNECT_Q_MGR
 
 qmgr = pymqi.QueueManager(None)
-qmgr.connect_with_options(config['qmgr'], cd=cd, sco=sco, opts=opts)
+qmgr.connect_with_options(config['qmgr'], user=config['user'], password=config['password'], cd=cd, sco=sco, opts=opts)
 queue = pymqi.Queue(qmgr, config['queue'])
 
 while True:
