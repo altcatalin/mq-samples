@@ -2,9 +2,27 @@
 
 ## How to use
 
+### Run IBM MQ with Docker
+
+```shell
+# build Docker image
+# https://community.ibm.com/community/user/integration/blogs/richard-coppen/2023/06/30/ibm-mq-9330-container-image-now-available-for-appl
+
+# prepare .env
+cp sample.env .env
+
+# start containers
+docker compose up -d
+```
+
+### Run samples
+
 ```shell
 # build Docker image
 docker build --tag mq-samples .
+
+# Apple Silicon
+docker buildx build --platform linux/amd64 --tag mq-samples .
 
 # run the TLS sample program - replace [[PLACEHOLDER]] with real values
 # https://www.ibm.com/docs/en/ibm-mq/9.3?topic=program-running-tls-sample
