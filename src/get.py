@@ -3,6 +3,7 @@ import pathlib
 import logging
 import time
 import pymqi
+import random
 from dotenv import dotenv_values
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
@@ -39,6 +40,9 @@ if config['mtls']:
     sco.KeyRepository = config['key_repository'].encode(encoding='UTF-8')
     sco.CertificateLabel = config['cert_label'].encode(encoding='UTF-8')
 
+    config['user'] = None
+    config['password'] = None
+
 md = pymqi.MD()
 
 gmo = pymqi.GMO()
@@ -60,10 +64,17 @@ while True:
         md.CorrelId = pymqi.CMQC.MQCI_NONE
         md.GroupId = pymqi.CMQC.MQGI_NONE
 
+        logging.info(f"Sleep for 1 second")
+        time.sleep(1)
+
     except pymqi.MQMIError as e:
         if e.comp == pymqi.CMQC.MQCC_FAILED and e.reason == pymqi.CMQC.MQRC_NO_MSG_AVAILABLE:
             logging.info(f"No messages in '{config['queue']}' queue")
-            time.sleep(2)
+            
+            sleep = random.randint(1, 30)
+            logging.info(f"Sleep for {sleep} seconds")
+            time.sleep(sleep)
+
             pass
         else:
             raise

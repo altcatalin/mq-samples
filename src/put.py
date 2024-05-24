@@ -3,6 +3,7 @@ import base64
 import pathlib
 import logging
 import time
+import random
 import pymqi
 from dotenv import dotenv_values
 
@@ -40,6 +41,9 @@ if config['mtls']:
     sco.KeyRepository = config['key_repository'].encode(encoding='UTF-8')
     sco.CertificateLabel = config['cert_label'].encode(encoding='UTF-8')
 
+    config['user'] = None
+    config['password'] = None
+
 opts = pymqi.CMQC.MQCNO_RECONNECT_Q_MGR
 
 qmgr = pymqi.QueueManager(None)
@@ -47,10 +51,13 @@ qmgr.connect_with_options(config['qmgr'], user=config['user'], password=config['
 queue = pymqi.Queue(qmgr, config['queue'])
 
 while True:
-    message = f"Hello {base64.urlsafe_b64encode(os.urandom(32)).decode()}!"
+    message = f"Hello {config['qmgr']}:{base64.urlsafe_b64encode(os.urandom(32)).decode()}!"
     logging.info(f"Put message '{message}' in '{config['queue']}' queue")
     queue.put(message)
-    time.sleep(2)
+    
+    sleep = random.randint(1, 15)
+    logging.info(f"Sleep for {sleep} seconds")
+    time.sleep(sleep)
 
 queue.close()
 qmgr.disconnect()
