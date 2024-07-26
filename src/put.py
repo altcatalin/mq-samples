@@ -6,6 +6,7 @@ import time
 import random
 import pymqi
 from dotenv import dotenv_values
+import argparse
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -19,6 +20,10 @@ config = {
     "user": os.getenv("MQ_USER", "app"),
     "password": os.getenv("MQ_USER_PASSWORD", "passw0rd"),
 }
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--max_sleep", type=int, default=15, help="Maximum sleep time in seconds")
+args = parser.parse_args()
 
 logging.info(f"Connect to '{config['qmgr']}' queue manager from '{config['connection']}' via '{config['channel']}' channel")
 
@@ -52,10 +57,10 @@ queue = pymqi.Queue(qmgr, config['queue'])
 
 while True:
     message = f"Hello {config['qmgr']}:{base64.urlsafe_b64encode(os.urandom(32)).decode()}!"
-    logging.info(f"Put message '{message}' in '{config['queue']}' queue")
+    logging.info(f"Put message '{message}' in '{config['qmgr']}:{config['queue']}' queue")
     queue.put(message)
     
-    sleep = random.randint(1, 15)
+    sleep = random.randint(1, args.max_sleep)
     logging.info(f"Sleep for {sleep} seconds")
     time.sleep(sleep)
 
