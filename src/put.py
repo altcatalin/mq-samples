@@ -49,6 +49,12 @@ if config['mtls']:
     config['user'] = None
     config['password'] = None
 
+md = pymqi.MD()
+# md.MsgId = pymqi.CMQC.MQMI_NONE
+
+pmo = pymqi.PMO()
+pmo.Options = pymqi.CMQC.MQPMO_NEW_MSG_ID
+
 opts = pymqi.CMQC.MQCNO_RECONNECT_Q_MGR
 
 qmgr = pymqi.QueueManager(None)
@@ -57,8 +63,8 @@ queue = pymqi.Queue(qmgr, config['queue'])
 
 while True:
     message = f"Hello {config['qmgr']}:{base64.urlsafe_b64encode(os.urandom(32)).decode()}!"
-    logging.info(f"Put message '{message}' in '{config['qmgr']}:{config['queue']}' queue")
-    queue.put(message)
+    queue.put(message, md, pmo)
+    logging.info(f"PUT -> {config['qmgr']}:{config['queue']} -> {message} ({md.MsgId.hex()})")
     
     sleep = random.randint(1, args.max_sleep)
     logging.info(f"Sleep for {sleep} seconds")

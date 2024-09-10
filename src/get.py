@@ -21,7 +21,7 @@ config = {
 }
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--max_sleep", type=int, default=15, help="Maximum sleep time in seconds")
+parser.add_argument("--max_sleep", type=int, default=3, help="Maximum sleep time in seconds")
 args = parser.parse_args()
 
 logging.info(f"Connect to '{config['qmgr']}' queue manager from '{config['connection']}' via '{config['channel']}' channel")
@@ -63,7 +63,7 @@ queue = pymqi.Queue(qmgr, config['queue'])
 while True:
     try:
         message = queue.get(None, md, gmo)
-        logging.info(f"Got message '{message}' from '{config['qmgr']}:{config['queue']}' queue")
+        logging.info(f"GET -> {config['qmgr']}:{config['queue']} -> {message} ({md.MsgId.hex()})")
 
         md.MsgId = pymqi.CMQC.MQMI_NONE
         md.CorrelId = pymqi.CMQC.MQCI_NONE
