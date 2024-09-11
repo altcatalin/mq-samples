@@ -62,10 +62,10 @@ qmgr.connect_with_options(config['qmgr'], user=config['user'], password=config['
 queue = pymqi.Queue(qmgr, config['queue'])
 
 while True:
-    message = f"Hello {config['qmgr']}:{base64.urlsafe_b64encode(os.urandom(32)).decode()}!"
+    message = f"{config['qmgr']}:{base64.urlsafe_b64encode(os.urandom(16)).decode()}"
     queue.put(message, md, pmo)
-    logging.info(f"PUT -> {config['qmgr']}:{config['queue']} -> {message} ({md.MsgId.hex()})")
-    
+    logging.info(f"PUT {config['qmgr']}:{config['queue']} -> Msg:{message}, MsgId:{md.MsgId.hex()}, CorrelId:{md.CorrelId.hex()}")
+
     sleep = random.randint(1, args.max_sleep)
     logging.info(f"Sleep for {sleep} seconds")
     time.sleep(sleep)

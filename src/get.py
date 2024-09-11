@@ -63,7 +63,7 @@ queue = pymqi.Queue(qmgr, config['queue'])
 while True:
     try:
         message = queue.get(None, md, gmo)
-        logging.info(f"GET -> {config['qmgr']}:{config['queue']} -> {message} ({md.MsgId.hex()})")
+        logging.info(f"GET {config['qmgr']}:{config['queue']} -> Msg:{message}, MsgId:{md.MsgId.hex()}, CorrelId:{md.CorrelId.hex()}")
 
         md.MsgId = pymqi.CMQC.MQMI_NONE
         md.CorrelId = pymqi.CMQC.MQCI_NONE
